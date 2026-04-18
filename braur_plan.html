@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>מחולל תכנית בראור — משטרת ישראל</title>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;800&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0a0f1e;
+  --surface:#111827;
+  --surface2:#1c2538;
+  --border:rgba(255,255,255,0.07);
+  --border2:rgba(255,255,255,0.13);
+  --text:#f0f4ff;
+  --muted:#7a8aaa;
+  --accent:#3b82f6;
+  --accent2:#60a5fa;
+  --green:#22c55e;
+  --red:#ef4444;
+  --yellow:#eab308;
+  --orange:#f97316;
+  --radius:10px;
+  --radius-lg:16px;
+}
+body.light{
+  --bg:#f0f4f8;
+  --surface:#ffffff;
+  --surface2:#e8edf5;
+  --border:rgba(0,0,0,0.08);
+  --border2:rgba(0,0,0,0.14);
+  --text:#0f172a;
+  --muted:#64748b;
+  --accent:#1d4ed8;
+  --accent2:#3b82f6;
+}
+body{font-family:'Heebo',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding:1.5rem 1rem 4rem;direction:rtl}
+.page{max-width:740px;margin:0 auto}
+header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:2rem}
+.logo{display:flex;flex-direction:column}
+.logo h1{font-size:22px;font-weight:800;letter-spacing:-0.5px;color:var(--text)}
+.logo h1 span{color:var(--accent)}
+.logo p{font-size:12px;color:var(--muted);margin-top:3px}
+.theme-btn{background:transparent;border:0.5px solid var(--border2);border-radius:8px;color:var(--muted);font-family:'Heebo',sans-serif;font-size:12px;padding:6px 10px;cursor:pointer}
+.card{background:var(--surface);border:0.5px solid var(--border);border-radius:var(--radius-lg);padding:1.25rem;margin-bottom:0.75rem}
+.section-label{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.75rem}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+.field label{display:block;font-size:12px;color:var(--muted);margin-bottom:4px}
+input,select{width:100%;background:var(--surface2);border:0.5px solid var(--border2);border-radius:var(--radius);color:var(--text);font-family:'Heebo',sans-serif;font-size:13px;padding:9px 12px;outline:none;transition:border-color .15s;direction:rtl}
+input:focus,select:focus{border-color:var(--accent)}
+input::placeholder{color:var(--muted)}
+select option{background:var(--surface)}
+.btn{width:100%;background:var(--accent);color:#fff;border:none;border-radius:var(--radius);font-family:'Heebo',sans-serif;font-size:15px;font-weight:700;padding:13px;cursor:pointer;transition:opacity .15s;margin-top:.5rem}
+.btn:hover{opacity:.88}
+.btn-outline{background:transparent;color:var(--accent);border:1px solid var(--accent);border-radius:var(--radius);font-family:'Heebo',sans-serif;font-size:13px;font-weight:600;padding:10px;cursor:pointer;width:100%;margin-top:.5rem;transition:background .15s,color .15s}
+.btn-outline:hover{background:var(--accent);color:#fff}
+
+/* braur status */
+.status-card{border-radius:var(--radius-lg);padding:1.25rem;margin-bottom:.75rem}
+.status-pass{background:rgba(34,197,94,.1);border:0.5px solid rgba(34,197,94,.3)}
+.status-fail{background:rgba(239,68,68,.1);border:0.5px solid rgba(239,68,68,.3)}
+.status-title{font-size:18px;font-weight:800;margin-bottom:.75rem}
+.status-pass .status-title{color:var(--green)}
+.status-fail .status-title{color:var(--red)}
+.status-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:0.5px solid var(--border);font-size:13px}
+.status-row:last-child{border-bottom:none}
+.status-row .label{color:var(--muted)}
+.badge-pass{color:var(--green);font-weight:700}
+.badge-fail{color:var(--red);font-weight:700}
+.badge-gap{font-size:11px;color:var(--muted);margin-right:4px}
+
+/* week plan */
+.week-header{display:flex;align-items:center;gap:8px;margin-bottom:.75rem}
+.week-title{font-size:15px;font-weight:700}
+.badge-week{font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px}
+.badge-a{background:rgba(59,130,246,.15);color:var(--accent2)}
+.badge-b{background:rgba(34,197,94,.12);color:var(--green)}
+
+.day-row{display:flex;gap:12px;padding:10px 0;border-bottom:0.5px solid var(--border);align-items:flex-start}
+.day-row:last-child{border-bottom:none}
+.day-name{min-width:22px;font-size:13px;font-weight:700;color:var(--muted);padding-top:1px}
+.day-body{flex:1}
+.day-title{font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px}
+.day-sub{font-size:11px;color:var(--muted)}
+
+.ex-block{margin-top:6px}
+.ex-item{display:flex;justify-content:space-between;align-items:baseline;padding:3px 0;font-size:12px;border-bottom:0.5px dashed var(--border)}
+.ex-item:last-child{border-bottom:none}
+.ex-name{color:var(--text);font-weight:500;flex:1}
+.ex-sets{color:var(--muted);white-space:nowrap;margin-right:6px}
+.level-dot{font-size:9px;margin-right:3px}
+
+.metrics-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:1rem}
+.metric{background:var(--surface2);border-radius:var(--radius);padding:10px 12px}
+.metric-label{font-size:10px;color:var(--muted);margin-bottom:3px}
+.metric-val{font-size:17px;font-weight:700;color:var(--accent)}
+
+/* level selector */
+.level-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.level-item{background:var(--surface2);border-radius:var(--radius);padding:10px 12px}
+.level-item label{font-size:11px;color:var(--muted);display:block;margin-bottom:5px}
+.level-item select{font-size:12px;padding:6px 10px}
+
+#output{display:none;margin-top:1rem}
+.save-btn{width:100%;margin-top:.5rem;background:transparent;color:var(--accent);border:1px solid var(--accent);border-radius:var(--radius-lg);font-family:'Heebo',sans-serif;font-size:13px;font-weight:600;padding:11px;cursor:pointer;transition:background .15s,color .15s}
+.save-btn:hover{background:var(--accent);color:#fff}
+
+/* restore banner */
+.restore-banner{display:none;margin-bottom:.75rem;background:var(--surface2);border:0.5px solid var(--accent);border-radius:var(--radius-lg);padding:14px 16px}
+.restore-title{font-size:13px;color:var(--accent);font-weight:600;margin-bottom:8px}
+.restore-list{display:flex;flex-direction:column;gap:6px;margin-bottom:8px}
+.restore-row{display:flex;gap:8px;align-items:center;position:relative;z-index:1}
+.restore-btn{flex:1;background:var(--accent);color:#fff;border:none;border-radius:8px;font-family:'Heebo',sans-serif;font-size:11px;font-weight:700;padding:8px 10px;cursor:pointer;text-align:right}
+.restore-del{flex-shrink:0;background:transparent;color:var(--muted);border:0.5px solid var(--border2);border-radius:8px;font-family:'Heebo',sans-serif;font-size:11px;padding:8px 10px;cursor:pointer;position:relative;z-index:2}
+.new-plan-btn{width:100%;background:transparent;color:var(--muted);border:0.5px solid var(--border2);border-radius:8px;font-family:'Heebo',sans-serif;font-size:12px;padding:8px;cursor:pointer}
+
+@media(max-width:500px){.grid3{grid-template-columns:1fr 1fr}.metrics-grid{grid-template-columns:1fr 1fr}.level-grid{grid-template-columns:1fr}}
+
+.info-btn{background:transparent;border:0.5px solid var(--border2);border-radius:50%;color:var(--muted);font-size:10px;width:16px;height:16px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;margin-right:4px;vertical-align:middle;flex-shrink:0}
+.info-btn:hover{color:var(--accent);border-color:var(--accent)}
+.info-panel{display:none;background:var(--surface2);border:0.5px solid var(--border2);border-radius:8px;padding:10px 12px;margin-top:6px;font-size:12px;color:var(--muted);line-height:1.7}
+.info-panel.open{display:block}
+</style>
+</head>
+<body>
+<div class="page">
+<header>
+  <div class="logo">
+    <h1>תכנית <span>בראור</span></h1>
+    <p>מחולל תכנית אימונים — קורס חוקרים</p>
+  </div>
+  <button class="theme-btn" id="theme-btn" onclick="toggleTheme()">☀ בהיר</button>
+</header>
+
+<div class="restore-banner" id="restore-banner">
+  <div class="restore-title">תכניות שמורות</div>
+  <div class="restore-list" id="restore-list"></div>
+  <button class="new-plan-btn" onclick="newPlan()">תכנית חדשה</button>
+</div>
+
+<div class="card">
+  <div class="section-label">פרטים אישיים</div>
+  <div class="grid3">
+    <div class="field"><label>שם מלא</label><input type="text" id="name" placeholder="ישראל ישראלי"/></div>
+    <div class="field"><label>מספר אישי</label><input type="text" id="pid" placeholder="123456"/></div>
+    <div class="field"><label>מין</label><select id="gender"><option value="m">גבר</option><option value="f">אישה</option></select></div>
+  </div>
+  <div class="grid3" style="margin-top:10px">
+    <div class="field"><label>גיל</label><input type="number" id="age" min="18" max="55" placeholder="30"/></div>
+    <div></div>
+    <div></div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="section-label">תוצאות נוכחיות</div>
+  <div class="grid3">
+    <div class="field"><label>ריצת 2000מ (דק:שנ)</label><input type="text" id="run2000" placeholder="11:30"/></div>
+    <div class="field"><label>חתירות TRX</label><input type="number" id="trx" min="0" max="50" placeholder="15"/></div>
+    <div class="field"><label>שכיבות ניתוק</label><input type="number" id="pushclap" min="0" max="60" placeholder="12"/></div>
+  </div>
+  <div class="field" style="margin-top:10px">
+    <label>רמת כושר ריצה נוכחית</label>
+    <select id="run-level">
+      <option value="good">עובר בנוחות — מהיר מהנדרש</option>
+      <option value="ok" selected>עובר בקושי — בדיוק על הסף</option>
+      <option value="fail">לא עובר — איטי מהנדרש</option>
+    </select>
+  </div>
+</div>
+
+<div class="card">
+  <div class="section-label">רמת תחלה — בחר רמה מקסימלית שאתה יכול לבצע 8 חזרות</div>
+  <div class="level-grid">
+    <div class="level-item">
+      <label>דחיפות (1–10)</label>
+      <select id="lvl-push">
+        <option value="1">1 — שכיבות שמיכה בשיפוע — גובה אגן 🟢</option>
+        <option value="2">2 — שכיבות שמיכה בשיפוע — גובה ברך 🟢</option>
+        <option value="3">3 — שכיבות שמיכה רגילות 🟡</option>
+        <option value="4" selected>4 — שכיבות ניתוק ★ 🟡</option>
+        <option value="5">5 — שכיבות טווח מוגדל 🟡</option>
+        <option value="6">6 — שכיבות + משקל 🔴</option>
+        <option value="7">7 — מקבילים ללא משקל 🔴</option>
+        <option value="8">8 — מקבילים + 5 ק"ג 🔴</option>
+        <option value="9">9 — מקבילים + 10 ק"ג 🔴</option>
+        <option value="10">10 — מקבילים + 15 ק"ג 🔴</option>
+      </select>
+    </div>
+    <div class="level-item">
+      <label>משיכות / TRX (1–10)</label>
+      <select id="lvl-pull">
+        <option value="1">1 — TRX מעל האגן 🟢</option>
+        <option value="2">2 — TRX קו האגן 🟢</option>
+        <option value="3" selected>3 — TRX גובה ברך ★ 🟡</option>
+        <option value="4">4 — TRX אופקי + הגבהה 🟡</option>
+        <option value="5">5 — TRX + הגבהה + 5 ק"ג 🟡</option>
+        <option value="6">6 — מתח ללא משקל 🔴</option>
+        <option value="7">7 — מתח + 5 ק"ג 🔴</option>
+        <option value="8">8 — מתח + 10 ק"ג 🔴</option>
+        <option value="9">9 — מתח + 15 ק"ג 🔴</option>
+        <option value="10">10 — מתח + 20 ק"ג 🔴</option>
+      </select>
+    </div>
+    <div class="level-item">
+      <label>לאנג׳ (1–10)</label>
+      <select id="lvl-lunge">
+        <option value="1">1 — לאנג׳ ללא משקל 🟢</option>
+        <option value="2">2 — לאנג׳ + 5 ק"ג 🟢</option>
+        <option value="3">3 — לאנג׳ + 10 ק"ג 🟡</option>
+        <option value="4" selected>4 — לאנג׳ + 15 ק"ג 🟡</option>
+        <option value="5">5 — לאנג׳ + 20 ק"ג 🟡</option>
+        <option value="6">6 — לאנג׳ + 25 ק"ג 🔴</option>
+        <option value="7">7 — Bulgarian + 10 ק"ג 🔴</option>
+        <option value="8">8 — Bulgarian + 15 ק"ג 🔴</option>
+        <option value="9">9 — Bulgarian + 20 ק"ג 🔴</option>
+        <option value="10">10 — Bulgarian + 25 ק"ג 🔴</option>
+      </select>
+    </div>
+    <div class="level-item">
+      <label>תאומים (1–10)</label>
+      <select id="lvl-calf">
+        <option value="1">1 — 2 רגליים מרצפה 🟢</option>
+        <option value="2">2 — 2 רגליים — עקב מונמך מעט 🟢</option>
+        <option value="3" selected>3 — 2 רגליים — עקב מונמך מלא 🟡</option>
+        <option value="4">4 — רגל אחת מרצפה 🟡</option>
+        <option value="5">5 — רגל אחת — עקב מונמך מעט 🟡</option>
+        <option value="6">6 — רגל אחת — עקב מונמך מלא 🔴</option>
+        <option value="7">7 — רגל אחת + 5 ק"ג 🔴</option>
+        <option value="8">8 — רגל אחת + 10 ק"ג 🔴</option>
+        <option value="9">9 — רגל אחת + 15 ק"ג 🔴</option>
+        <option value="10">10 — רגל אחת + 20 ק"ג 🔴</option>
+      </select>
+    </div>
+  </div>
+</div>
+
+<button class="btn" onclick="generate()">צור תכנית לשבועיים</button>
+
+<div id="output">
+  <div id="braur-status"></div>
+
+  <div class="card" style="margin-top:.75rem">
+    <div class="section-label">ערכי ריצה</div>
+    <div class="metrics-grid">
+      <div class="metric"><div class="metric-label">קצב בסיס</div><div class="metric-val" id="m-base">—</div></div>
+      <div class="metric"><div class="metric-label">אינטרוולים</div><div class="metric-val" id="m-interval">—</div></div>
+      <div class="metric"><div class="metric-label">טמפו</div><div class="metric-val" id="m-tempo">—</div></div>
+      <div class="metric"><div class="metric-label">נפח קל</div><div class="metric-val" id="m-easy">—</div></div>
+      <div class="metric"><div class="metric-label">אינטרוולים ארוכים</div><div class="metric-val" id="m-long">—</div></div>
+      <div class="metric"><div class="metric-label">סדר שבועות</div><div class="metric-val" id="m-week" style="font-size:13px">A → B → A → B</div></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="week-header"><span class="week-title">שבוע A</span><span class="badge-week badge-a">עצימות</span></div>
+    <div id="week-a"></div>
+  </div>
+
+  <div class="card">
+    <div class="week-header"><span class="week-title">שבוע B</span><span class="badge-week badge-b">נפח</span></div>
+    <div id="week-b"></div>
+  </div>
+
+  <div class="card">
+    <div class="section-label">כללי התקדמות</div>
+    <div style="font-size:12px;color:var(--muted);line-height:1.8">
+      <div>🔺 <strong>8–12 חזרות</strong> (דחיפות / משיכות / לאנג׳) — הגעת ל-12 → עלה רמה | פחות מ-8 → רד רמה</div>
+      <div>🔺 <strong>20–30 חזרות</strong> (תאומים) — הגעת ל-30 → עלה רמה | פחות מ-20 → רד רמה</div>
+      <div>🔄 כל 6 שבועות — בצע מבחן מחודש ועדכן תוצאות</div>
+    </div>
+  </div>
+
+  <button class="save-btn" onclick="savePlan()">שמור תכנית</button>
+</div>
+</div>
+
+<script>
+// ── Data ──────────────────────────────────────────────────────────────────────
+const PUSH = [
+  {n:'שכיבות שמיכה בשיפוע חיובי — גובה אגן', d:'🟢'},
+  {n:'שכיבות שמיכה בשיפוע חיובי — גובה ברך', d:'🟢'},
+  {n:'שכיבות שמיכה רגילות', d:'🟡'},
+  {n:'שכיבות שמיכה עם ניתוק ידיים ★', d:'🟡'},
+  {n:'שכיבות שמיכה טווח תנועה מוגדל', d:'🟡'},
+  {n:'שכיבות שמיכה + משקל', d:'🔴'},
+  {n:'מקבילים ללא משקל', d:'🔴'},
+  {n:'מקבילים + 5 ק"ג', d:'🔴'},
+  {n:'מקבילים + 10 ק"ג', d:'🔴'},
+  {n:'מקבילים + 15 ק"ג', d:'🔴'},
+];
+const PULL = [
+  {n:'TRX בשיפוע מעל האגן', d:'🟢'},
+  {n:'TRX בשיפוע בקו האגן', d:'🟢'},
+  {n:'TRX בשיפוע בגובה הברך ★', d:'🟡'},
+  {n:'TRX אופקי + רגליים על הגבהה', d:'🟡'},
+  {n:'TRX אופקי + הגבהה + 5 ק"ג', d:'🟡'},
+  {n:'מתח ללא משקל', d:'🔴'},
+  {n:'מתח + 5 ק"ג', d:'🔴'},
+  {n:'מתח + 10 ק"ג', d:'🔴'},
+  {n:'מתח + 15 ק"ג', d:'🔴'},
+  {n:'מתח + 20 ק"ג', d:'🔴'},
+];
+const LUNGE = [
+  {n:"לאנג' אחורי ללא משקל", d:'🟢'},
+  {n:"לאנג' אחורי + 5 ק\"ג", d:'🟢'},
+  {n:"לאנג' אחורי + 10 ק\"ג", d:'🟡'},
+  {n:"לאנג' אחורי + 15 ק\"ג", d:'🟡'},
+  {n:"לאנג' אחורי + 20 ק\"ג", d:'🟡'},
+  {n:"לאנג' אחורי + 25 ק\"ג", d:'🔴'},
+  {n:'Bulgarian split squat + 10 ק"ג', d:'🔴'},
+  {n:'Bulgarian split squat + 15 ק"ג', d:'🔴'},
+  {n:'Bulgarian split squat + 20 ק"ג', d:'🔴'},
+  {n:'Bulgarian split squat + 25 ק"ג', d:'🔴'},
+];
+const CALF = [
+  {n:'עלייה 2 רגליים — מגובה רצפה', d:'🟢'},
+  {n:'עלייה 2 רגליים — עקב מונמך מעט', d:'🟢'},
+  {n:'עלייה 2 רגליים — עקב מונמך מלא', d:'🟡'},
+  {n:'עלייה רגל אחת — מגובה רצפה', d:'🟡'},
+  {n:'עלייה רגל אחת — עקב מונמך מעט', d:'🟡'},
+  {n:'עלייה רגל אחת — עקב מונמך מלא', d:'🔴'},
+  {n:'עלייה רגל אחת + 5 ק"ג', d:'🔴'},
+  {n:'עלייה רגל אחת + 10 ק"ג', d:'🔴'},
+  {n:'עלייה רגל אחת + 15 ק"ג', d:'🔴'},
+  {n:'עלייה רגל אחת + 20 ק"ג', d:'🔴'},
+];
+
+// Braur requirements
+const BRAUR = {
+  m: [{age:[0,29], run:'10:48', runS:648, trx:19, push:19},
+      {age:[30,37], run:'11:34', runS:694, trx:16, push:16},
+      {age:[38,44], run:'12:15', runS:735, trx:13, push:13}],
+  f: [{age:[0,29], run:'12:40', runS:760, trx:12, push:12},
+      {age:[30,37], run:'13:20', runS:800, trx:10, push:10},
+      {age:[38,44], run:'13:56', runS:836, trx:7, push:7}],
+};
+const AGE_BONUS = [{range:[0,29],b:0},{range:[30,37],b:4},{range:[38,44],b:8}];
+
+function parseTime(s){const p=s.trim().split(':');if(p.length!==2)return null;const m=parseInt(p[0]),sc=parseInt(p[1]);if(isNaN(m)||isNaN(sc))return null;return m*60+sc}
+function secsToMin(s){const m=Math.floor(s/60),sc=Math.round(s%60);return m+':'+(sc<10?'0':'')+sc}
+
+function getBraurRow(gender, age){
+  const rows = BRAUR[gender];
+  const row = rows.find(r => age >= r.age[0] && age <= r.age[1]);
+  if (!row) console.warn('גיל מחוץ לטווח הטבלה — משתמש בשורת 38-44');
+  return row || rows[rows.length-1];
+}
+
+// Algorithm: get 3 exercises for a scale based on max level
+function getExercises(scale, maxLvl) {
+  const idx = maxLvl - 1; // 0-based
+  if (maxLvl <= 2) {
+    // 3 sets same exercise
+    return [{ex: scale[idx], sets: 3, lvl: maxLvl}];
+  } else if (maxLvl <= 5) {
+    // max, max-1, max-1
+    return [
+      {ex: scale[idx], sets: 2, lvl: maxLvl},
+      {ex: scale[Math.max(0, idx-1)], sets: 2, lvl: maxLvl-1},
+      {ex: scale[Math.max(0, idx-1)], sets: 2, lvl: maxLvl-1},
+    ];
+  } else {
+    // max, max-2, max-4
+    return [
+      {ex: scale[idx], sets: 2, lvl: maxLvl},
+      {ex: scale[Math.max(0, idx-2)], sets: 2, lvl: Math.max(1, maxLvl-2)},
+      {ex: scale[Math.max(0, idx-4)], sets: 2, lvl: Math.max(1, maxLvl-4)},
+    ];
+  }
+}
+
+function exBlock(exercises, repsStr) {
+  return `<div class="ex-block">${exercises.map(e =>
+    `<div class="ex-item">
+      <span class="ex-name"><span class="level-dot">${e.ex.d}</span>${e.ex.n}</span>
+      <span class="ex-sets">${e.sets}×${repsStr}</span>
+    </div>`
+  ).join('')}</div>`;
+}
+
+const RUN_INFO = {
+  short: '<strong>אינטרוולים קצרים</strong> — ריצות קצרות (300מ) בעצימות גבוהה עם מנוחה בין כל חזרה. המנוחה מאפשרת שחזור חלקי. 90 שנ׳ = עומס גבוה | 120 שנ׳ = שחזור טוב יותר.',
+  long:  '<strong>אינטרוולים ארוכים</strong> — ריצות ארוכות (800מ) בקצב מאמץ גבוה. בונות סיבולת אירובית ומשפרות את הקצב ב-2000מ.',
+  tempo: '<strong>טמפו</strong> — ריצה רציפה בקצב מאמץ גבוה אבל נשלט. מרגיש קשה אבל אפשר לדבר משפטים קצרים. מחזקת את הסף האירובי.',
+  easy:  '<strong>נפח קל</strong> — ריצה נוחה 25–30 דקות. אפשר לדבר בחופשיות. מי שקשה לו לרוץ ברציפות — מותר לשלב הפוגות הליכה (למשל 3 דקות ריצה + 1 הליכה). המטרה היא זמן על הרגליים, לא קצב.',
+};
+
+function infoBtn(type) {
+  return `<button class="info-btn" onclick="toggleInfo('${type}')" title="מה זה?">ℹ</button><div class="info-panel" id="info-${type}">${RUN_INFO[type]}</div>`;
+}
+
+function toggleInfo(type) {
+  document.getElementById('info-' + type).classList.toggle('open');
+}
+
+function dayRow(day, content) {
+  return `<div class="day-row"><div class="day-name">${day}</div><div class="day-body">${content}</div></div>`;
+}
+function restDay() { return `<div class="day-title" style="color:var(--muted)">מנוחה</div>`; }
+
+const FILLOUT = 'https://forms.fillout.com/t/3fMaZkfRkUus';
+
+function getReps(lvl, isCalf) {
+  if (isCalf) return lvl <= 2 ? '20–30 × 3 סטים' : '20–30';
+  return lvl <= 2 ? '8–12 × 3 סטים' : '8–12';
+}
+
+function buildDesc(title, exercises, legs, calves) {
+  const exStr = exercises.map(e => `${e.ex.n}×${e.sets}סטים`).join(' | ');
+  const lungeStr = legs.map(e => `${e.ex.n}×${e.sets}סטים`).join(' | ');
+  const calfStr = calves.map(e => `${e.ex.n}×${e.sets}סטים`).join(' | ');
+  const type = title.includes('דחיפות') ? 'דחיפות' : 'משיכות';
+  return `${type}: ${exStr} | רגליים: ${lungeStr} | תאומים: ${calfStr}`;
+}
+
+function reportBtn(ex, desc) {
+  const name = document.getElementById('name').value.trim();
+  const pidVal = document.getElementById('pid').value.trim();
+  const url = `${FILLOUT}?ex=${encodeURIComponent(ex)}&desc=${encodeURIComponent(desc)}&name=${encodeURIComponent(name)}&pid=${encodeURIComponent(pidVal)}`;
+  return `<a href="${url}" target="_blank" style="display:inline-block;margin-top:8px;background:var(--accent);color:#fff;border-radius:6px;font-family:'Heebo',sans-serif;font-size:11px;font-weight:700;padding:5px 12px;text-decoration:none;">✓ דווח על אימון</a>`;
+}
+
+function strengthDay(type, exs, reps, desc) {
+  return `
+    <div class="day-title">כוח — ${type} + רגליים</div>
+    <div class="day-sub" style="margin-bottom:4px">${type}:</div>
+    ${exBlock(exs, reps)}
+    <div class="day-sub" style="margin:6px 0 4px">רגליים:</div>
+    ${exBlock(window._lungeExs, window._lungeReps)}
+    ${exBlock(window._calfExs, window._calfReps)}
+    ${reportBtn('כוח', desc)}`;
+}
+
+function newPlan() {
+  document.getElementById('restore-banner').style.display = 'none';
+  ['name','pid','age','run2000','trx','pushclap'].forEach(id => {
+    document.getElementById(id).value = '';
+  });
+  document.getElementById('gender').value = 'm';
+  document.getElementById('run-level').value = 'ok';
+  document.getElementById('lvl-push').value = 4;
+  document.getElementById('lvl-pull').value = 3;
+  document.getElementById('lvl-lunge').value = 4;
+  document.getElementById('lvl-calf').value = 3;
+  document.getElementById('output').style.display = 'none';
+}
+
+function generate() {
+  const name = document.getElementById('name').value.trim();
+  const gender = document.getElementById('gender').value;
+  const age = parseInt(document.getElementById('age').value) || 30;
+  const runStr = document.getElementById('run2000').value;
+  const trx = parseInt(document.getElementById('trx').value) || 0;
+  const pushClap = parseInt(document.getElementById('pushclap').value) || 0;
+  const lvlPush = parseInt(document.getElementById('lvl-push').value);
+  const lvlPull = parseInt(document.getElementById('lvl-pull').value);
+  const lvlLunge = parseInt(document.getElementById('lvl-lunge').value);
+  const lvlCalf = parseInt(document.getElementById('lvl-calf').value);
+
+  const runSecs = parseTime(runStr);
+  if (!runSecs) { alert('יש להזין זמן ריצה בפורמט דקות:שניות'); return; }
+
+  // Braur status
+  const br = getBraurRow(gender, age);
+  const runPass = runSecs <= br.runS;
+  const trxPass = trx >= br.trx;
+  const pushPass = pushClap >= br.push;
+  const allPass = runPass && trxPass && pushPass;
+
+  const statusDiv = document.getElementById('braur-status');
+  statusDiv.className = 'status-card ' + (allPass ? 'status-pass' : 'status-fail');
+  statusDiv.innerHTML = `
+    <div class="status-title">${allPass ? '✅ עובר בראור' : '❌ לא עובר בראור'}</div>
+    <div class="status-row">
+      <span class="label">ריצת 2000מ</span>
+      <span>${secsToMin(runSecs)} ${runPass ? '<span class="badge-pass">✓</span>' : `<span class="badge-fail">✗</span><span class="badge-gap">חסר ${secsToMin(runSecs - br.runS)}</span>`}</span>
+    </div>
+    <div class="status-row">
+      <span class="label">חתירות TRX</span>
+      <span>${trx} ${trxPass ? '<span class="badge-pass">✓</span>' : `<span class="badge-fail">✗</span><span class="badge-gap">חסר ${br.trx - trx}</span>`}</span>
+    </div>
+    <div class="status-row">
+      <span class="label">שכיבות ניתוק</span>
+      <span>${pushClap} ${pushPass ? '<span class="badge-pass">✓</span>' : `<span class="badge-fail">✗</span><span class="badge-gap">חסר ${br.push - pushClap}</span>`}</span>
+    </div>
+    <div class="status-row" style="margin-top:4px">
+      <span class="label">נדרש לעבור</span>
+      <span style="color:var(--muted);font-size:12px">ריצה ≤ ${br.run} | TRX ≥ ${br.trx} | שכיבות ≥ ${br.push}</span>
+    </div>`;
+
+  // Running paces
+  const base = runSecs / 2;
+  const interval = base * 0.82;
+  const tempo = base * 1.12;
+  const easy = base * 1.32;
+  const longInt = base * 0.90;
+
+  document.getElementById('m-base').textContent = secsToMin(base) + '/ק"מ';
+  document.getElementById('m-interval').textContent = secsToMin(interval) + '/ק"מ';
+  document.getElementById('m-tempo').textContent = secsToMin(tempo) + '/ק"מ';
+  document.getElementById('m-easy').textContent = secsToMin(easy) + '/ק"מ';
+  document.getElementById('m-long').textContent = secsToMin(longInt) + '/ק"מ';
+  document.getElementById('m-week').textContent = 'A → B';
+
+  const shortDetail = `300×8 @ ${secsToMin(interval)}/ק"מ | מנוחה 90–120 שנ'`;
+  const longDetail = `800×3 @ ${secsToMin(longInt)}/ק"מ | מנוחה 90–120 שנ'`;
+  const runLevel = document.getElementById('run-level').value;
+  const tempoMins = runLevel === 'good' ? '15–17' : runLevel === 'ok' ? '12–15' : '10–12';
+  const tempoDetail = `${tempoMins} דקות @ ${secsToMin(tempo)}/ק"מ`;
+  const easyDetail = `25–30 דקות @ ${secsToMin(easy)}/ק"מ | ניתן לשלב הפוגות הליכה לפי הרמה`;
+
+  // Exercise sets
+  const pushExs = getExercises(PUSH, lvlPush);
+  const pullExs = getExercises(PULL, lvlPull);
+  const lungeExs = getExercises(LUNGE, lvlLunge);
+  const calfExs = getExercises(CALF, lvlCalf);
+
+  const pushReps = getReps(lvlPush, false);
+  const pullReps = getReps(lvlPull, false);
+  const lungeReps = getReps(lvlLunge, false);
+  const calfReps = getReps(lvlCalf, true);
+
+  // expose to strengthDay
+  window._lungeExs = lungeExs;
+  window._lungeReps = lungeReps;
+  window._calfExs = calfExs;
+  window._calfReps = calfReps;
+
+  // reportBtn and buildDesc are defined globally below
+
+  const pushDesc = buildDesc('כוח — דחיפות', pushExs, lungeExs, calfExs);
+  const pullDesc = buildDesc('כוח — משיכות', pullExs, lungeExs, calfExs);
+
+  const pushDay = () => strengthDay('דחיפות', pushExs, pushReps, pushDesc);
+  const pullDay = () => strengthDay('משיכות', pullExs, pullReps, pullDesc);
+
+  document.getElementById('week-a').innerHTML =
+    dayRow('א', pushDay()) +
+    dayRow('ב', `<div class="day-title">ריצה — אינטרוולים קצרים ${infoBtn('short')}</div><div class="day-sub">${shortDetail}</div>${reportBtn('ריצה', 'אינטרוולים קצרים: ' + shortDetail)}`) +
+    dayRow('ג', restDay()) +
+    dayRow('ד', pullDay()) +
+    dayRow('ה', `<div class="day-title">ריצה — טמפו ${infoBtn('tempo')}</div><div class="day-sub">${tempoDetail}</div>${reportBtn('ריצה', 'טמפו: ' + tempoDetail)}`) +
+    dayRow('ו', restDay()) +
+    dayRow('ש', restDay());
+
+  document.getElementById('week-b').innerHTML =
+    dayRow('א', pushDay()) +
+    dayRow('ב', `<div class="day-title">ריצה — אינטרוולים ארוכים ${infoBtn('long')}</div><div class="day-sub">${longDetail}</div>${reportBtn('ריצה', 'אינטרוולים ארוכים: ' + longDetail)}`) +
+    dayRow('ג', restDay()) +
+    dayRow('ד', pullDay()) +
+    dayRow('ה', `<div class="day-title">ריצה — נפח קל ${infoBtn('easy')}</div><div class="day-sub">${easyDetail}</div>${reportBtn('ריצה', 'נפח קל: ' + easyDetail)}`) +
+    dayRow('ו', restDay()) +
+    dayRow('ש', restDay());
+
+  document.getElementById('output').style.display = 'block';
+  document.getElementById('output').scrollIntoView({behavior:'smooth', block:'start'});
+
+  window._planData = {
+    name, gender, age, runStr, trx, pushClap, lvlPush, lvlPull, lvlLunge, lvlCalf,
+    runLevel, pid: document.getElementById('pid').value.trim(),
+    shortDetail, longDetail, tempoDetail, easyDetail
+  };
+  localStorage.setItem('last_test_date', Date.now().toString());
+}
+
+function savePlan() {
+  if (!window._planData) return;
+  const plans = JSON.parse(localStorage.getItem('braur_plans') || '[]');
+  const now = new Date();
+  const dateStr = now.toLocaleDateString('he-IL', {day:'2-digit', month:'2-digit', year:'2-digit'});
+  const entry = { ...window._planData, savedAt: dateStr };
+  plans.unshift(entry);
+  if (plans.length > 3) plans.pop();
+  localStorage.setItem('braur_plans', JSON.stringify(plans));
+  const btn = document.querySelector('.save-btn');
+  btn.textContent = 'נשמר!';
+  btn.style.background = 'var(--accent)';
+  btn.style.color = '#fff';
+  setTimeout(() => { btn.textContent = 'שמור תכנית'; btn.style.background = 'transparent'; btn.style.color = 'var(--accent)'; }, 2000);
+}
+
+function renderRestore() {
+  const plans = JSON.parse(localStorage.getItem('braur_plans') || '[]');
+  const banner = document.getElementById('restore-banner');
+  if (!plans.length) { banner.style.display = 'none'; return; }
+  banner.style.display = 'block';
+  const list = document.getElementById('restore-list');
+  list.innerHTML = plans.map((p, i) => `
+    <div class="restore-row">
+      <button class="restore-btn" onclick="restorePlan(${i})">${p.savedAt} · ${p.name || 'ללא שם'} · דחיפות ${p.lvlPush} משיכות ${p.lvlPull}</button>
+      <button class="restore-del" onclick="event.stopPropagation(); deletePlan(${i})">✕</button>
+    </div>`).join('');
+}
+
+function restorePlan(i) {
+  const plans = JSON.parse(localStorage.getItem('braur_plans') || '[]');
+  const p = plans[i];
+  if (!p) return;
+  document.getElementById('name').value = p.name || '';
+  document.getElementById('pid').value = p.pid || '';
+  document.getElementById('gender').value = p.gender || 'm';
+  document.getElementById('age').value = p.age || '';
+  document.getElementById('run2000').value = p.runStr || '';
+  document.getElementById('trx').value = p.trx || '';
+  document.getElementById('pushclap').value = p.pushClap || '';
+  document.getElementById('lvl-push').value = p.lvlPush || 4;
+  document.getElementById('lvl-pull').value = p.lvlPull || 3;
+  document.getElementById('lvl-lunge').value = p.lvlLunge || 4;
+  document.getElementById('lvl-calf').value = p.lvlCalf || 3;
+  if (p.runLevel) document.getElementById('run-level').value = p.runLevel;
+  document.getElementById('restore-banner').style.display = 'none';
+  generate();
+}
+
+function deletePlan(i) {
+  const plans = JSON.parse(localStorage.getItem('braur_plans') || '[]');
+  plans.splice(i, 1);
+  localStorage.setItem('braur_plans', JSON.stringify(plans));
+  renderRestore();
+}
+
+function toggleTheme() {
+  const light = document.body.classList.toggle('light');
+  document.getElementById('theme-btn').textContent = light ? '🌙 כהה' : '☀ בהיר';
+  localStorage.setItem('braur_theme', light ? 'light' : 'dark');
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+  if (localStorage.getItem('braur_theme') === 'light') {
+    document.body.classList.add('light');
+    document.getElementById('theme-btn').textContent = '🌙 כהה';
+  }
+  renderRestore();
+});
+</script>
+</body>
+</html>
